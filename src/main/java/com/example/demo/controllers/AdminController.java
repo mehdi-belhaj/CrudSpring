@@ -1,9 +1,11 @@
 package com.example.demo.controllers;
 
+import com.example.demo.dao.AdminRepository;
 import com.example.demo.dto.AdminDto;
 import com.example.demo.dto.requests.AdminRequest;
 import com.example.demo.dto.responses.AdminResponse;
 import com.example.demo.dto.responses.enums.ErrorMessage;
+import com.example.demo.entities.Admin;
 import com.example.demo.exceptions.AdminException;
 import com.example.demo.services.AdminService;
 import org.springframework.beans.BeanUtils;
@@ -14,7 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -25,9 +29,9 @@ public class AdminController {
     @Autowired
     AdminService adminService;
 
-//create
+    //create
     @PostMapping("/admins")
-    public ResponseEntity<AdminResponse> createAdmin (@RequestBody @Valid AdminRequest adminRequest) throws Exception {
+    public ResponseEntity<AdminResponse> createAdmin(@RequestBody @Valid AdminRequest adminRequest) throws Exception {
         if (adminRequest.getFirstname().isEmpty())
             throw new AdminException(ErrorMessage.MISSING_REQUIRED_FIELD.getErrorMessage());
 
@@ -37,63 +41,65 @@ public class AdminController {
 
         BeanUtils.copyProperties(adminRequest, adminDto);
 
-        AdminDto createAdminDto = new AdminDto();
+        AdminDto CreateAdminDto = new AdminDto();
 
-        if ((createAdminDto = adminService.createAdmin(adminDto)) != null) {
-            System.out.println("CreateAdminDto" );
-        }
-        else{
+        if ((CreateAdminDto = adminService.createAdmin(adminDto)) != null) {
+            System.out.println("CreateAdminDto");
+
+        } else {
             return new ResponseEntity<>(HttpStatus.FOUND);
         }
-        BeanUtils.copyProperties(createAdminDto, adminResponse);
+
+        BeanUtils.copyProperties(CreateAdminDto, adminResponse);
         return new ResponseEntity<AdminResponse>(adminResponse, HttpStatus.CREATED);
+
     }
 
-//get
+    //get
     @GetMapping("/admins/{username}")
-    public AdminResponse getAdminByUsername(@PathVariable String username){
+    public AdminResponse getAdminByUsername(@PathVariable String username) {
 
         AdminDto adminDto = new AdminDto();
 
         AdminResponse adminResponse = new AdminResponse();
 
-        try{
+        try {
             adminDto = adminService.getAdminByUsername(username);
-            BeanUtils.copyProperties(adminDto ,adminResponse);
-        }catch (IllegalStateException e){
+            BeanUtils.copyProperties(adminDto, adminResponse);
+        } catch (IllegalStateException e) {
             e.printStackTrace();
         }
         return adminResponse;
 
     }
 
-//get
+    //get
     @GetMapping("/admins/{email}")
-    public AdminResponse getAdmin(@PathVariable String email){
+    public AdminResponse getAdmin(@PathVariable String email) {
 
-        AdminDto adminDto = new AdminDto();
+        AdminDto adminDto1 = new AdminDto();
 
         AdminResponse adminResponse = new AdminResponse();
 
-        try{
-            adminDto = adminService.getAdmin(email);
-            BeanUtils.copyProperties(adminDto ,adminResponse);
-        }catch (IllegalStateException e){
+        try {
+            adminDto1 = adminService.getAdmin(email);
+            BeanUtils.copyProperties(adminDto1, adminResponse);
+        } catch (IllegalStateException e) {
             e.printStackTrace();
         }
         return adminResponse;
     }
 
 
-//update
-    @PutMapping("/admins/{username}")
-    public ResponseEntity<AdminResponse> updateAdmin(@PathVariable String username, @Valid @RequestBody AdminRequest adminRequest){
+    //update
+    @PutMapping("/admins/{id}")
+    public ResponseEntity<AdminResponse> updateAdmin(@PathVariable String id, @Valid @RequestBody AdminRequest adminRequest) {
 
         AdminDto adminDto = new AdminDto();
 
         BeanUtils.copyProperties(adminRequest, adminDto);
 
-        AdminDto updateAdmin = adminService.updateAdmin(username, adminDto);
+        AdminDto updateAdmin = adminService.updateAdmin(id, adminDto);
 
         AdminResponse adminResponse = new AdminResponse();
 
@@ -102,17 +108,17 @@ public class AdminController {
         return new ResponseEntity<AdminResponse>(adminResponse, HttpStatus.ACCEPTED);
     }
 
-//delete
+    //delete
     @DeleteMapping("/admins/{username}")
-    public ResponseEntity <Map<String,Boolean>> deleteAdmin(@PathVariable String username){
+    public ResponseEntity<Map<String, Boolean>> deleteAdmin(@PathVariable String username) {
 
         adminService.deleteAdmin(username);
 
-        Map<String,Boolean> response = new HashMap<>();
+        Map<String, Boolean> response = new HashMap<>();
 
         response.put("deleted", Boolean.TRUE);
 
-        return  new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
 
     }
 

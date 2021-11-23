@@ -11,9 +11,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-@Service
-@Transactional
-@Component
+
 
 public interface AdminService {
 
@@ -32,7 +30,9 @@ public interface AdminService {
     List<AdminDto> getAllAdmins();
 
 
-    /*MessageResponse createAdmin(SignupRequest AdminRequest);
+}
+
+ /*MessageResponse createAdmin(SignupRequest AdminRequest);
 
     //Optional<Admin> updateAdmin(Long id, SignupRequest AdminRequest);
 
@@ -41,4 +41,3 @@ public interface AdminService {
     //Admin getAdminById(Long id);
 
     //List<Admin> getAllAdmin();*/
-}
