@@ -1,11 +1,12 @@
 package com.example.demo.services;
 
+import java.util.List;
+
 import com.example.demo.dto.CandidateDto;
 import com.example.demo.entities.Candidate;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CandidatService {
 
@@ -13,15 +14,16 @@ public interface CandidatService {
 
     CandidateDto getCandidate(String email);
 
-    CandidateDto getCandidateByUsername(String username) ;
+    CandidateDto getCandidateById(Long id);
 
-    CandidateDto updateCandidate(String username, CandidateDto candidateDto);
+    CandidateDto getCandidateByUsername(String username);
 
-    void deleteCandidate(String username);
+    CandidateDto updateCandidate(Long id, CandidateDto candidateDto);
 
+    void deleteCandidate(Long id);
 
     List<CandidateDto> getAllCandidates();
 
-
+    Page<Candidate> findAllCandidates(Pageable pageable);
 
 }

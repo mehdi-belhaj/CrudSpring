@@ -1,25 +1,26 @@
-package com.example.demo.dto.requests;
+package com.example.demo.dto;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-import com.example.demo.enumerations.ActivityArea;
 import com.example.demo.enumerations.Gender;
-import com.example.demo.enumerations.Poste;
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class CandidateRequest {
-    private Poste poste;
-    private ActivityArea activityArea;
+public class UtilisateurDto implements Serializable {
     private String firstname;
     private String lastname;
-    private String email;
-    private String picture;
     private String username;
+    private String email;
     private String password;
+    private String picture;
     private LocalDate dateOfBirth;
     private Gender gender;
     private String phone;

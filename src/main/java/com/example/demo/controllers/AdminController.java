@@ -1,161 +1,142 @@
 package com.example.demo.controllers;
 
-import com.example.demo.dao.AdminRepository;
+import javax.validation.Valid;
+
 import com.example.demo.dto.AdminDto;
+import com.example.demo.dto.CandidateDto;
 import com.example.demo.dto.requests.AdminRequest;
+import com.example.demo.dto.requests.CandidateRequest;
 import com.example.demo.dto.responses.AdminResponse;
-import com.example.demo.dto.responses.enums.ErrorMessage;
+import com.example.demo.dto.responses.CandidateResponse;
 import com.example.demo.entities.Admin;
-import com.example.demo.exceptions.AdminException;
+import com.example.demo.entities.Candidate;
 import com.example.demo.services.AdminService;
+import com.example.demo.services.CandidatService;
+import com.example.demo.services.UserService;
+import com.example.demo.utils.ResponseObject;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AdviceMode;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.example.demo.config.services.UserDetailsImpl;
 
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@CrossOrigin(origins = {"*"})
-@RequestMapping(value = "/api")
+@RequestMapping("${api.endpoint}/admin")
 
 public class AdminController {
-    @Autowired
-    AdminService adminService;
+        @Autowired
+        AdminService adminService;
+        @Autowired
+        CandidatService candidatService;
+        @Autowired
+        UserService userService;
 
-    //create
-    @PostMapping("/admins")
-    public ResponseEntity<AdminResponse> createAdmin(@RequestBody @Valid AdminRequest adminRequest) throws Exception {
-        if (adminRequest.getFirstname().isEmpty())
-            throw new AdminException(ErrorMessage.MISSING_REQUIRED_FIELD.getErrorMessage());
+        @PostMapping("/candidate")
+        public ResponseEntity<ResponseObject<CandidateResponse>> createCandidate(
+                        @RequestBody @Valid CandidateRequest candidateRequest) {
 
-        AdminDto adminDto = new AdminDto();
+                CandidateDto candidateDto = new CandidateDto();
 
-        AdminResponse adminResponse = new AdminResponse();
+                CandidateResponse candidateResponse = new CandidateResponse();
 
-        BeanUtils.copyProperties(adminRequest, adminDto);
+                BeanUtils.copyProperties(candidateRequest, candidateDto);
 
-        AdminDto CreateAdminDto = new AdminDto();
+                CandidateDto candidateDto2 = candidatService.createCandidate(candidateDto);
 
-        if ((CreateAdminDto = adminService.createAdmin(adminDto)) != null) {
-            System.out.println("CreateAdminDto");
+                BeanUtils.copyProperties(candidateDto2, candidateResponse);
+                ResponseObject<CandidateResponse> responseObject = new ResponseObject<CandidateResponse>(true,
+                                "Candidate created successfully", candidateResponse);
+                return new ResponseEntity<ResponseObject<CandidateResponse>>(responseObject, HttpStatus.CREATED);
 
-        } else {
-            return new ResponseEntity<>(HttpStatus.FOUND);
         }
 
-        BeanUtils.copyProperties(CreateAdminDto, adminResponse);
-        return new ResponseEntity<AdminResponse>(adminResponse, HttpStatus.CREATED);
+        @GetMapping("/candidate/{id}")
+        public ResponseEntity<ResponseObject<CandidateResponse>> getCandidate(@PathVariable Long id) {
 
-    }
+                CandidateDto candidateDto = candidatService.getCandidateById(id);
 
-    //get
-    @GetMapping("/admins/{username}")
-    public AdminResponse getAdminByUsername(@PathVariable String username) {
+                CandidateResponse candidateResponse = new CandidateResponse();
 
-        AdminDto adminDto = new AdminDto();
+                BeanUtils.copyProperties(candidateDto, candidateResponse);
 
-        AdminResponse adminResponse = new AdminResponse();
-
-        try {
-            adminDto = adminService.getAdminByUsername(username);
-            BeanUtils.copyProperties(adminDto, adminResponse);
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
+                ResponseObject<CandidateResponse> responseObject = new ResponseObject<CandidateResponse>(true,
+                                "Candidate data", candidateResponse);
+                return new ResponseEntity<ResponseObject<CandidateResponse>>(responseObject, HttpStatus.OK);
         }
-        return adminResponse;
 
-    }
-
-    //get
-    @GetMapping("/admins/{email}")
-    public AdminResponse getAdmin(@PathVariable String email) {
-
-        AdminDto adminDto1 = new AdminDto();
-
-        AdminResponse adminResponse = new AdminResponse();
-
-        try {
-            adminDto1 = adminService.getAdmin(email);
-            BeanUtils.copyProperties(adminDto1, adminResponse);
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
+        @GetMapping("/candidate")
+        public ResponseEntity<ResponseObject<Page<Candidate>>> getAllCandidates(
+                        @RequestParam(name = "page", defaultValue = "0") int page,
+                        @RequestParam(name = "size", defaultValue = "10") int size) {
+                ResponseObject<Page<Candidate>> responseObject = new ResponseObject<Page<Candidate>>(true,
+                                "All Candidate data", candidatService.findAllCandidates(PageRequest.of(page, size)));
+                return new ResponseEntity<ResponseObject<Page<Candidate>>>(responseObject, HttpStatus.OK);
         }
-        return adminResponse;
-    }
 
+        @DeleteMapping("/candidate/{id}")
+        public ResponseEntity<ResponseObject<String>> DeleteCandidate(@PathVariable Long id) {
+                candidatService.deleteCandidate(id);
+                ResponseObject<String> responseObject = new ResponseObject<String>(true,
+                                "Candidate deleted successfully", null);
+                return new ResponseEntity<ResponseObject<String>>(responseObject, HttpStatus.OK);
+        }
 
-    //update
-    @PutMapping("/admins/{id}")
-    public ResponseEntity<AdminResponse> updateAdmin(@PathVariable String id, @Valid @RequestBody AdminRequest adminRequest) {
+        @PutMapping("/candidate/{id}")
+        public ResponseEntity<ResponseObject<CandidateResponse>> updateCandidate(@PathVariable Long id,
+                        @Valid @RequestBody CandidateRequest candidateRequest) {
 
-        AdminDto adminDto = new AdminDto();
+                CandidateDto candidateDto = new CandidateDto();
 
-        BeanUtils.copyProperties(adminRequest, adminDto);
+                BeanUtils.copyProperties(candidateRequest, candidateDto);
 
-        AdminDto updateAdmin = adminService.updateAdmin(id, adminDto);
+                CandidateDto updateCandidate = candidatService.updateCandidate(id, candidateDto);
 
-        AdminResponse adminResponse = new AdminResponse();
+                CandidateResponse candidateResponse = new CandidateResponse();
 
-        BeanUtils.copyProperties(updateAdmin, adminResponse);
+                BeanUtils.copyProperties(updateCandidate, candidateResponse);
 
-        return new ResponseEntity<AdminResponse>(adminResponse, HttpStatus.ACCEPTED);
-    }
+                ResponseObject<CandidateResponse> responseObject = new ResponseObject<CandidateResponse>(true,
+                                "Candidate updated successfully", candidateResponse);
+                return new ResponseEntity<ResponseObject<CandidateResponse>>(responseObject, HttpStatus.OK);
+        }
 
-    //delete
-    @DeleteMapping("/admins/{username}")
-    public ResponseEntity<Map<String, Boolean>> deleteAdmin(@PathVariable String username) {
+        @PutMapping("/personalData")
+        public ResponseEntity<ResponseObject<AdminResponse>> updateCandidate(
+                        @Valid @RequestBody AdminRequest adminRequest) {
 
-        adminService.deleteAdmin(username);
+                Object userPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        Map<String, Boolean> response = new HashMap<>();
+                String username = ((UserDetailsImpl) userPrincipal).getUsername();
 
-        response.put("deleted", Boolean.TRUE);
+                Admin user = (Admin) this.userService.getUtilisateur(username);
 
-        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+                AdminDto adminDto = new AdminDto();
 
-    }
+                BeanUtils.copyProperties(adminRequest, adminDto);
 
+                AdminDto adminDto2 = adminService.updateAdmin(user.getId(), adminDto);
 
+                AdminResponse adminResponse = new AdminResponse();
+
+                BeanUtils.copyProperties(adminDto2, adminResponse);
+
+                ResponseObject<AdminResponse> responseObject = new ResponseObject<AdminResponse>(true,
+                                "Admin updated successfully", adminResponse);
+                return new ResponseEntity<ResponseObject<AdminResponse>>(responseObject, HttpStatus.OK);
+        }
 }
-
-
-
-
-
-
-
-    /*
-    @GetMapping("/all")
-    public ResponseEntity<List<Admin>> getAllAdmin () {
-        List<Admin> admins = adminService.getAllAdmin();
-        return new ResponseEntity<>(admins, HttpStatus.OK);
-    }
-    @GetMapping("/find/{id}")
-    public ResponseEntity<Admin> getAdminById (@PathVariable("id") Long id) {
-        Admin admin = adminService.getAdminById(id);
-        return new ResponseEntity<>(admin, HttpStatus.OK);
-    }
-    @PostMapping("/add")
-    public ResponseEntity<MessageResponse> addAdmin(@RequestBody SignupRequest admin) {
-        MessageResponse newAdmin = adminService.createAdmin(admin);
-        return new ResponseEntity<>(newAdmin, HttpStatus.CREATED);
-    }
-    @PutMapping("/update/{id}")
-    public ResponseEntity<MessageResponse> updateAdmin( @PathVariable Long id, @RequestBody SignupRequest admin) {
-        Optional<Admin> updateAdmin = adminService.updateAdmin(id, admin);
-        return new ResponseEntity(updateAdmin, HttpStatus.OK);
-    }
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteAdmin(@PathVariable("id") Long id) {
-        adminService.deleteAdmin(id);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-    */
-

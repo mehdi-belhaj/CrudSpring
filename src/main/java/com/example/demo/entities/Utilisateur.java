@@ -1,6 +1,9 @@
 package com.example.demo.entities;
 
 import com.example.demo.enumerations.Gender;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -55,6 +58,7 @@ public class Utilisateur implements Serializable {
     private String phone;
     private String address;
     private boolean state;
+    @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
@@ -64,6 +68,16 @@ public class Utilisateur implements Serializable {
         this.lastname = lastname;
         this.username = username;
         this.email = email;
+        this.password = password;
+    }
+
+    @JsonIgnore
+    public String getPassword() {
+        return password;
+    }
+
+    @JsonProperty
+    public void setPassword(String password) {
         this.password = password;
     }
 
