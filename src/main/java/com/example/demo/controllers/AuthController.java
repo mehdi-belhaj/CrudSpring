@@ -1,18 +1,34 @@
 package com.example.demo.controllers;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
 import com.example.demo.config.jwt.JwtUtils;
 import com.example.demo.config.services.UserDetailsImpl;
+import com.example.demo.dao.CandidateRepository;
 import com.example.demo.dao.RoleRepository;
 import com.example.demo.dao.UserRepository;
+import com.example.demo.dao.AdminRepository;
 import com.example.demo.dto.requests.LoginRequest;
 import com.example.demo.dto.requests.SignupRequest;
 import com.example.demo.dto.responses.MessageResponse;
+import com.example.demo.dto.responses.UtilisateurResponse;
+import com.example.demo.entities.Admin;
+import com.example.demo.entities.Candidate;
 import com.example.demo.entities.Role;
 import com.example.demo.entities.Utilisateur;
 import com.example.demo.enumerations.RoleName;
+import com.example.demo.exceptions.EntityNotFoundException;
 import com.example.demo.services.UserService;
 import com.example.demo.utils.ResponseObject;
-import lombok.Data;
+
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,14 +37,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-
-import javax.validation.Valid;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -39,6 +55,12 @@ public class AuthController {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    CandidateRepository candidateRepository;
+
+    @Autowired
+    AdminRepository adminRepository;
 
     @Autowired
     RoleRepository roleRepository;
@@ -85,56 +107,70 @@ public class AuthController {
         if (!signUpRequest.getPassword().equals(signUpRequest.getConfirmedPassword()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please confirm your password");
 
-
         // Create new user's account
         Utilisateur user = new Utilisateur(signUpRequest.getFirstname(), signUpRequest.getLastname(),
                 signUpRequest.getUsername(), signUpRequest.getEmail(), encoder.encode(signUpRequest.getPassword()));
 
-        Set<String> strRoles = signUpRequest.getRole();
+        String strRole = signUpRequest.getRole();
         Set<Role> roles = new HashSet<>();
 
-        if (strRoles == null) {
-            Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(userRole);
+        if (strRole == null) {
+            ResponseObject<UtilisateurResponse> responseObjectError = new ResponseObject<UtilisateurResponse>(false,
+                    "Registration incomplete", null);
+            return new ResponseEntity<ResponseObject<UtilisateurResponse>>(responseObjectError, HttpStatus.OK);
         } else {
-            strRoles.forEach(role -> {
-                switch (role) {
-                    case "admin":
-                        Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(adminRole);
+            switch (strRole) {
+            case "admin":
+                Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
+                        .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                roles.add(adminRole);
+                user.setRoles(roles);
+                Admin admin = new Admin();
+                BeanUtils.copyProperties(user, admin);
+                Admin admin2 = adminRepository.save(admin);
+                UtilisateurResponse utilisateurResponse = new UtilisateurResponse();
+                BeanUtils.copyProperties(admin2, utilisateurResponse);
+                ResponseObject<UtilisateurResponse> responseObject = new ResponseObject<UtilisateurResponse>(true,
+                        "User registered successfully!", utilisateurResponse);
+                return new ResponseEntity<ResponseObject<UtilisateurResponse>>(responseObject, HttpStatus.OK);
+            case "candidat":
+                Role candidateRole = roleRepository.findByName(RoleName.ROLE_CANDIDAT)
+                        .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                roles.add(candidateRole);
+                user.setRoles(roles);
+                Candidate canidate = new Candidate();
+                BeanUtils.copyProperties(user, canidate);
+                Candidate canidate2 = candidateRepository.save(canidate);
+                UtilisateurResponse utilisateurResponse2 = new UtilisateurResponse();
+                BeanUtils.copyProperties(canidate2, utilisateurResponse2);
+                ResponseObject<UtilisateurResponse> responseObject2 = new ResponseObject<UtilisateurResponse>(true,
+                        "User registered successfully!", utilisateurResponse2);
+                return new ResponseEntity<ResponseObject<UtilisateurResponse>>(responseObject2, HttpStatus.OK);
+            default:
+                ResponseObject<UtilisateurResponse> responseObjectError = new ResponseObject<UtilisateurResponse>(false,
+                        "Role is incorrect", null);
+                return new ResponseEntity<ResponseObject<UtilisateurResponse>>(responseObjectError, HttpStatus.OK);
+            }
+        }
+    }
 
-                        break;
-                    case "candidat":
-                        Role modRole = roleRepository.findByName(RoleName.ROLE_CANDIDAT)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(modRole);
+    @GetMapping(value = "/logout")
+    public ResponseEntity<ResponseObject<Void>> Logout(HttpServletResponse response, HttpServletRequest request) {
 
-                        break;
-                    default:
-                        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(userRole);
-                }
-            });
+        Object userPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String username = ((UserDetailsImpl) userPrincipal).getUsername();
+
+        Utilisateur user = this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("user nor found"));
+
+        // Emptying the security context holder
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            new SecurityContextLogoutHandler().logout(request, response, auth);
         }
 
-        user.setRoles(roles);
-        Utilisateur user2 = userRepository.save(user);
-        ResponseObject<Utilisateur> responseObject = new ResponseObject<Utilisateur>(true, "User registered successfully!", user2);
-        return new ResponseEntity<ResponseObject<Utilisateur>>(responseObject, HttpStatus.OK);
+        ResponseObject<Void> responseObject = new ResponseObject<Void>(true, "Logged out successfully", null);
+        return new ResponseEntity<ResponseObject<Void>>(responseObject, HttpStatus.OK);
     }
-
-    @PatchMapping("/users/{email}")
-    public boolean changePassword(@PathVariable String email, @RequestBody PasswordChange change) {
-        return userService.changePassword(change.getEmail(), change.getNewPassword());
-    }
-
-}
-
-@Data
-class PasswordChange {
-    private String email;
-    private String newPassword;
 }

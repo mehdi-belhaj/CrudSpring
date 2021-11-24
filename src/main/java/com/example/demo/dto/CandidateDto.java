@@ -1,15 +1,15 @@
 
- package com.example.demo.dto;
+package com.example.demo.dto;
 
 import com.example.demo.enumerations.ActivityArea;
 import com.example.demo.enumerations.Poste;
 import lombok.*;
 
- @Data
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class CandidateDto extends UtilisatuerDto{
+public class CandidateDto extends UtilisateurDto {
     private Poste poste;
     private ActivityArea activityArea;
 }

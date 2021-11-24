@@ -1,11 +1,8 @@
 package com.example.demo.services;
 
-import com.example.demo.dto.CandidateDto;
-import com.example.demo.entities.Candidate;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.Optional;
+
+import com.example.demo.dto.CandidateDto;
 
 public interface CandidatService {
 
@@ -13,15 +10,12 @@ public interface CandidatService {
 
     CandidateDto getCandidate(String email);
 
-    CandidateDto getCandidateByUsername(String username) ;
+    CandidateDto getCandidateByUsername(String username);
 
-    CandidateDto updateCandidate(String username, CandidateDto candidateDto);
+    CandidateDto updateCandidate(Long id, CandidateDto candidateDto);
 
     void deleteCandidate(String username);
 
-
     List<CandidateDto> getAllCandidates();
-
-
 
 }

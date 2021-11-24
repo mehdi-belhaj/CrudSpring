@@ -1,15 +1,14 @@
 package com.example.demo.services;
 
-import com.example.demo.entities.Candidate;
-import com.example.demo.entities.Utilisateur;
-
-import java.util.List;
+import com.example.demo.dto.requests.ChangePasswordRequest;
+import com.example.demo.dto.responses.MessageResponse;
+import com.example.demo.dto.responses.UtilisateurResponse;
+import com.example.demo.exceptions.EntityNotFoundException;
 
 public interface UserService {
 
-    public void saveUser(Utilisateur user);
+    public MessageResponse changePassword(String username, ChangePasswordRequest passwordBody)
+            throws EntityNotFoundException;
 
-    public boolean isUserAlreadyPresent(Utilisateur user);
-    public boolean changePassword(String email, String password);
-
+    public UtilisateurResponse getUser(String username);
 }
