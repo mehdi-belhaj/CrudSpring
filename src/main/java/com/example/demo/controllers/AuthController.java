@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.security.auth.login.CredentialException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -172,5 +173,19 @@ public class AuthController {
 
         ResponseObject<Void> responseObject = new ResponseObject<Void>(true, "Logged out successfully", null);
         return new ResponseEntity<ResponseObject<Void>>(responseObject, HttpStatus.OK);
+    }
+
+    @GetMapping("/me")
+    private ResponseEntity<Utilisateur> getMe() throws CredentialException {
+
+        Object userPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String username = ((UserDetailsImpl) userPrincipal).getUsername();
+
+        Utilisateur user = this.userService.getUtilisateur(username);
+        if (user == null)
+            throw new CredentialException("Invalid user");
+
+        return new ResponseEntity<Utilisateur>(user, HttpStatus.OK);
     }
 }

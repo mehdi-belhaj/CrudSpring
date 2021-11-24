@@ -2,18 +2,20 @@ package com.example.demo.dto.requests;
 
 import java.time.LocalDate;
 
-import com.example.demo.enumerations.ActivityArea;
 import com.example.demo.enumerations.Gender;
-import com.example.demo.enumerations.Poste;
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class CandidateRequest {
-    private Poste poste;
-    private ActivityArea activityArea;
+
+public class AdminRequest {
+    private String organization;
     private String firstname;
     private String lastname;
     private String email;

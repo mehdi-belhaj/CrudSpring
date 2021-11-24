@@ -14,6 +14,8 @@ public class UtilisateurRequest {
     private String lastname;
     private String email;
     private String picture;
+    private String username;
+    private String password;
     private LocalDate dateOfBirth;
     private Gender gender;
     private String phone;

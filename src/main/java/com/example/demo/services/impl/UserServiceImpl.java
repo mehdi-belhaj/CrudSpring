@@ -52,4 +52,10 @@ public class UserServiceImpl implements UserService {
         return utilisateurResponse;
     }
 
+    @Override
+    public Utilisateur getUtilisateur(String username) {
+
+        return userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("user nor found"));
+    }
+
 }
