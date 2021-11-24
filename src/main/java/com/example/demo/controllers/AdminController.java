@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.core.context.SecurityContextHolder;
 import com.example.demo.config.services.UserDetailsImpl;
+import org.apache.commons.lang3.StringUtils;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -82,10 +83,29 @@ public class AdminController {
         @GetMapping("/candidate")
         public ResponseEntity<ResponseObject<Page<Candidate>>> getAllCandidates(
                         @RequestParam(name = "page", defaultValue = "0") int page,
-                        @RequestParam(name = "size", defaultValue = "10") int size) {
-                ResponseObject<Page<Candidate>> responseObject = new ResponseObject<Page<Candidate>>(true,
-                                "All Candidate data", candidatService.findAllCandidates(PageRequest.of(page, size)));
-                return new ResponseEntity<ResponseObject<Page<Candidate>>>(responseObject, HttpStatus.OK);
+                        @RequestParam(name = "size", defaultValue = "10") int size,
+                        @RequestParam(required = false) String search, @RequestParam(required = false) String filter) {
+                ResponseObject<Page<Candidate>> responseObject = new ResponseObject<Page<Candidate>>();
+                if (StringUtils.isEmpty(search) && StringUtils.isEmpty(filter)) {
+                        responseObject = new ResponseObject<Page<Candidate>>(true, "All Candidate data",
+                                        candidatService.findAllCandidates(PageRequest.of(page, size)));
+                        return new ResponseEntity<ResponseObject<Page<Candidate>>>(responseObject, HttpStatus.OK);
+                }
+
+                else {
+                        if (!StringUtils.isEmpty(search)) {
+                                responseObject = new ResponseObject<Page<Candidate>>(true, "All Candidate data",
+                                                candidatService.searchAllCandidates(search,
+                                                                PageRequest.of(page, size)));
+                        }
+                        if (!StringUtils.isEmpty(filter)) {
+                                responseObject = new ResponseObject<Page<Candidate>>(true, "All Candidate data",
+                                                candidatService.filterAllCandidates(filter,
+                                                                PageRequest.of(page, size)));
+                        }
+                        return new ResponseEntity<ResponseObject<Page<Candidate>>>(responseObject, HttpStatus.OK);
+
+                }
         }
 
         @DeleteMapping("/candidate/{id}")

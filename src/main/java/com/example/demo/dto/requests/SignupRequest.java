@@ -1,7 +1,5 @@
 package com.example.demo.dto.requests;
 
-import java.util.Set;
-
 import javax.validation.constraints.*;
 
 public class SignupRequest {

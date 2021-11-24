@@ -11,6 +11,8 @@ import com.example.demo.dao.UserRepository;
 import com.example.demo.dto.CandidateDto;
 import com.example.demo.entities.Candidate;
 import com.example.demo.entities.Role;
+import com.example.demo.enumerations.ActivityArea;
+import com.example.demo.enumerations.Poste;
 import com.example.demo.enumerations.RoleName;
 import com.example.demo.exceptions.EntityNotFoundException;
 import com.example.demo.services.CandidatService;
@@ -159,26 +161,29 @@ public class CandidatServiceImpl implements CandidatService {
         return candidateDtoList;
     }
 
-    /*
-     * @Override public Candidate saveCandidat(Candidate candidate) { return
-     * candidateRepository.save(candidate); }
-     * 
-     * @Override public Optional<Candidate> findCandidatById(Long id) { return
-     * candidateRepository.findById(id); }
-     * 
-     * @Override public Optional<Candidate> findCandidatByUsername(String username)
-     * { return candidateRepository.findByUsername(username); }
-     * 
-     * @Override public Optional<Candidate> findCandidatByEmail(String email) {
-     * return candidateRepository.findByEmail(email); }
-     * 
-     * @Override public void deleteCandidat(Long id) {
-     * 
-     * candidateRepository.deleteById(id);
-     * 
-     * }
-     * 
-     * @Override public List<Candidate> getCandidates() { return
-     * candidateRepository.findAll(); }
-     */
+    @Override
+    public Page<Candidate> searchAllCandidates(String param, Pageable pageable) {
+        return candidateRepository
+                .findByFirstnameContainingIgnoreCaseOrLastnameContainingIgnoreCaseOrUsernameContainingIgnoreCase(param,
+                        param, param, pageable);
+    }
+
+    @Override
+    public Page<Candidate> filterAllCandidates(String param, Pageable pageable) {
+        for (Poste poste : Poste.values()) {
+            if (poste.name().equals(param)) {
+                return candidateRepository.findByPoste(poste, pageable);
+            }
+        }
+        for (ActivityArea activityArea : ActivityArea.values()) {
+            if (activityArea.name().equals(param)) {
+                return candidateRepository.findByActivityArea(activityArea, pageable);
+            }
+        }
+        return null;
+        // Poste poste = Poste.valueOf(param);
+        // ActivityArea activityArea = ActivityArea.valueOf(param);
+        // return candidateRepository.findByPosteOrActivityArea(poste, activityArea,
+        // pageable);
+    }
 }

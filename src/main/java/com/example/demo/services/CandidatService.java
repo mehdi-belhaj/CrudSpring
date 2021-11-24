@@ -26,4 +26,8 @@ public interface CandidatService {
 
     Page<Candidate> findAllCandidates(Pageable pageable);
 
+    Page<Candidate> searchAllCandidates(String param, Pageable pageable);
+
+    Page<Candidate> filterAllCandidates(String param, Pageable pageable);
+
 }
