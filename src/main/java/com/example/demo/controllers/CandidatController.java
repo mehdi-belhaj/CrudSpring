@@ -1,5 +1,6 @@
 package com.example.demo.controllers;
 
+import com.example.demo.config.services.UserDetailsImpl;
 import com.example.demo.dto.CandidateDto;
 import com.example.demo.dto.requests.CandidateRequest;
 import com.example.demo.dto.responses.CandidateResponse;
@@ -7,8 +8,6 @@ import com.example.demo.entities.Candidate;
 import com.example.demo.services.CandidatService;
 import com.example.demo.services.UserService;
 import com.example.demo.utils.ResponseObject;
-
-import com.example.demo.config.services.UserDetailsImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +27,12 @@ public class CandidatController {
     @Autowired
     UserService userService;
 
+    /**
+     * Update personal data of the Candidate
+     *
+     * @param candidateRequest
+     * @return candidateResponse
+     */
     @PutMapping("/personalData")
     public ResponseEntity<ResponseObject<CandidateResponse>> updateCandidate(
             @Valid @RequestBody CandidateRequest candidateRequest) {
