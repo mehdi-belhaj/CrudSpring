@@ -186,4 +186,14 @@ public class CandidatServiceImpl implements CandidatService {
         // return candidateRepository.findByPosteOrActivityArea(poste, activityArea,
         // pageable);
     }
+
+    @Override
+    public Boolean existUsername(String username) {
+        return candidateRepository.existsByUsername(username);
+    }
+
+    @Override
+    public Boolean existEmail(String email) {
+        return candidateRepository.existsByEmail(email);
+    }
 }

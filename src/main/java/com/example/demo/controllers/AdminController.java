@@ -7,6 +7,7 @@ import com.example.demo.dto.requests.AdminRequest;
 import com.example.demo.dto.requests.CandidateRequest;
 import com.example.demo.dto.responses.AdminResponse;
 import com.example.demo.dto.responses.CandidateResponse;
+import com.example.demo.dto.responses.MessageResponse;
 import com.example.demo.entities.Admin;
 import com.example.demo.entities.Candidate;
 import com.example.demo.services.AdminService;
@@ -44,9 +45,16 @@ public class AdminController {
          * @return candidateResponse
          */
         @PostMapping("/candidate")
-        public ResponseEntity<ResponseObject<CandidateResponse>> createCandidate(
+        public ResponseEntity<?> createCandidate(
                 @RequestBody @Valid CandidateRequest candidateRequest) {
 
+                if (candidatService.existUsername(candidateRequest.getUsername())) {
+                        return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+                }
+
+                if (candidatService.existEmail(candidateRequest.getEmail())) {
+                        return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+                }
                 CandidateDto candidateDto = new CandidateDto();
 
                 CandidateResponse candidateResponse = new CandidateResponse();

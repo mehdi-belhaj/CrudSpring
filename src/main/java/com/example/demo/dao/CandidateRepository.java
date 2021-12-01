@@ -27,6 +27,10 @@ public interface CandidateRepository extends JpaRepository<Candidate, Long> {
 
     Page<Candidate> findByActivityArea(ActivityArea activityArea, Pageable pageable);
 
+    Boolean existsByUsername(String username);
+
+    Boolean existsByEmail(String email);
+
 
 }
 // Page<Candidate> findByPosteOrActivityArea(Poste poste, ActivityArea

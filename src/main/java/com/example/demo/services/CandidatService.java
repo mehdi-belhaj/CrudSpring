@@ -1,12 +1,11 @@
 package com.example.demo.services;
 
-import java.util.List;
-
 import com.example.demo.dto.CandidateDto;
 import com.example.demo.entities.Candidate;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface CandidatService {
 
@@ -29,5 +28,9 @@ public interface CandidatService {
     Page<Candidate> searchAllCandidates(String param, Pageable pageable);
 
     Page<Candidate> filterAllCandidates(String param, Pageable pageable);
+
+    Boolean existUsername(String username);
+
+    Boolean existEmail(String email);
 
 }
