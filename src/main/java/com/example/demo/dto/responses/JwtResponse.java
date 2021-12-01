@@ -1,29 +1,27 @@
 package com.example.demo.dto.responses;
 
-import java.util.List;
-
 public class JwtResponse {
     private String token;
     private String type = "Bearer";
     private Long id;
     private String username;
     private String email;
-    private List<String> roles;
+    private String role;
 
-    public JwtResponse(String accessToken, Long id, String username, String email, List<String> roles) {
-        this.token = accessToken;
+    public JwtResponse(String token, Long id, String username, String email, String role) {
+        this.token = token;
         this.id = id;
         this.username = username;
         this.email = email;
-        this.roles = roles;
+        this.role = role;
     }
 
-    public String getAccessToken() {
-        return token;
+    public String getToken() {
+        return this.token;
     }
 
-    public void setAccessToken(String accessToken) {
-        this.token = accessToken;
+    public void setToken(String Token) {
+        this.token = Token;
     }
 
     public String getTokenType() {
@@ -58,7 +56,7 @@ public class JwtResponse {
         this.username = username;
     }
 
-    public List<String> getRoles() {
-        return roles;
+    public String getRole() {
+        return role;
     }
 }

@@ -18,6 +18,7 @@ import com.example.demo.dao.UserRepository;
 import com.example.demo.dao.AdminRepository;
 import com.example.demo.dto.requests.LoginRequest;
 import com.example.demo.dto.requests.SignupRequest;
+import com.example.demo.dto.responses.JwtResponse;
 import com.example.demo.dto.responses.MessageResponse;
 import com.example.demo.dto.responses.UtilisateurResponse;
 import com.example.demo.entities.Admin;
@@ -76,7 +77,7 @@ public class AuthController {
     UserService userService;
 
     @PostMapping("/signin")
-    public ResponseEntity<ResponseObject<String>> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<ResponseObject<JwtResponse>> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsernameOrEmail(), loginRequest.getPassword()));
@@ -87,12 +88,11 @@ public class AuthController {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
                 .collect(Collectors.toList());
-        String accessToken = jwt;
-        // return ResponseEntity.ok(
-        // new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(),
-        // userDetails.getEmail(), roles));
-        ResponseObject<String> responseObject = new ResponseObject<String>(true, "Signed in successfully", accessToken);
-        return new ResponseEntity<ResponseObject<String>>(responseObject, HttpStatus.OK);
+        JwtResponse jwtResponse = new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(),
+                userDetails.getEmail(), roles.get(0));
+        ResponseObject<JwtResponse> responseObject = new ResponseObject<JwtResponse>(true, "Signed in successfully",
+                jwtResponse);
+        return new ResponseEntity<ResponseObject<JwtResponse>>(responseObject, HttpStatus.OK);
     }
 
     @PostMapping("/signup")
@@ -121,36 +121,37 @@ public class AuthController {
             return new ResponseEntity<ResponseObject<UtilisateurResponse>>(responseObjectError, HttpStatus.OK);
         } else {
             switch (strRole) {
-            case "admin":
-                Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
-                        .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                roles.add(adminRole);
-                user.setRoles(roles);
-                Admin admin = new Admin();
-                BeanUtils.copyProperties(user, admin);
-                Admin admin2 = adminRepository.save(admin);
-                UtilisateurResponse utilisateurResponse = new UtilisateurResponse();
-                BeanUtils.copyProperties(admin2, utilisateurResponse);
-                ResponseObject<UtilisateurResponse> responseObject = new ResponseObject<UtilisateurResponse>(true,
-                        "User registered successfully!", utilisateurResponse);
-                return new ResponseEntity<ResponseObject<UtilisateurResponse>>(responseObject, HttpStatus.OK);
-            case "candidat":
-                Role candidateRole = roleRepository.findByName(RoleName.ROLE_CANDIDAT)
-                        .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                roles.add(candidateRole);
-                user.setRoles(roles);
-                Candidate canidate = new Candidate();
-                BeanUtils.copyProperties(user, canidate);
-                Candidate canidate2 = candidateRepository.save(canidate);
-                UtilisateurResponse utilisateurResponse2 = new UtilisateurResponse();
-                BeanUtils.copyProperties(canidate2, utilisateurResponse2);
-                ResponseObject<UtilisateurResponse> responseObject2 = new ResponseObject<UtilisateurResponse>(true,
-                        "User registered successfully!", utilisateurResponse2);
-                return new ResponseEntity<ResponseObject<UtilisateurResponse>>(responseObject2, HttpStatus.OK);
-            default:
-                ResponseObject<UtilisateurResponse> responseObjectError = new ResponseObject<UtilisateurResponse>(false,
-                        "Role is incorrect", null);
-                return new ResponseEntity<ResponseObject<UtilisateurResponse>>(responseObjectError, HttpStatus.OK);
+                case "ROLE_ADMIN":
+                    Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
+                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                    roles.add(adminRole);
+                    user.setRoles(roles);
+                    Admin admin = new Admin();
+                    BeanUtils.copyProperties(user, admin);
+                    Admin admin2 = adminRepository.save(admin);
+                    UtilisateurResponse utilisateurResponse = new UtilisateurResponse();
+                    BeanUtils.copyProperties(admin2, utilisateurResponse);
+                    ResponseObject<UtilisateurResponse> responseObject = new ResponseObject<UtilisateurResponse>(true,
+                            "User registered successfully!", utilisateurResponse);
+                    return new ResponseEntity<ResponseObject<UtilisateurResponse>>(responseObject, HttpStatus.OK);
+                case "ROLE_CANDIDAT":
+                    Role candidateRole = roleRepository.findByName(RoleName.ROLE_CANDIDAT)
+                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                    roles.add(candidateRole);
+                    user.setRoles(roles);
+                    Candidate canidate = new Candidate();
+                    BeanUtils.copyProperties(user, canidate);
+                    Candidate canidate2 = candidateRepository.save(canidate);
+                    UtilisateurResponse utilisateurResponse2 = new UtilisateurResponse();
+                    BeanUtils.copyProperties(canidate2, utilisateurResponse2);
+                    ResponseObject<UtilisateurResponse> responseObject2 = new ResponseObject<UtilisateurResponse>(true,
+                            "User registered successfully!", utilisateurResponse2);
+                    return new ResponseEntity<ResponseObject<UtilisateurResponse>>(responseObject2, HttpStatus.OK);
+                default:
+                    ResponseObject<UtilisateurResponse> responseObjectError = new ResponseObject<UtilisateurResponse>(
+                            false,
+                            "Role is incorrect", null);
+                    return new ResponseEntity<ResponseObject<UtilisateurResponse>>(responseObjectError, HttpStatus.OK);
             }
         }
     }
@@ -159,7 +160,6 @@ public class AuthController {
     public ResponseEntity<ResponseObject<Void>> Logout(HttpServletResponse response, HttpServletRequest request) {
 
         Object userPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         String username = ((UserDetailsImpl) userPrincipal).getUsername();
 
         Utilisateur user = this.userRepository.findByUsername(username)
@@ -179,9 +179,7 @@ public class AuthController {
     private ResponseEntity<Utilisateur> getMe() throws CredentialException {
 
         Object userPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         String username = ((UserDetailsImpl) userPrincipal).getUsername();
-
         Utilisateur user = this.userService.getUtilisateur(username);
         if (user == null)
             throw new CredentialException("Invalid user");
