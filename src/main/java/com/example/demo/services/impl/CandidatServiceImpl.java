@@ -1,10 +1,5 @@
 package com.example.demo.services.impl;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.example.demo.dao.CandidateRepository;
 import com.example.demo.dao.RoleRepository;
 import com.example.demo.dao.UserRepository;
@@ -16,7 +11,6 @@ import com.example.demo.enumerations.Poste;
 import com.example.demo.enumerations.RoleName;
 import com.example.demo.exceptions.EntityNotFoundException;
 import com.example.demo.services.CandidatService;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,6 +19,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class CandidatServiceImpl implements CandidatService {
@@ -163,9 +162,10 @@ public class CandidatServiceImpl implements CandidatService {
 
     @Override
     public Page<Candidate> searchAllCandidates(String param, Pageable pageable) {
-        return candidateRepository
-                .findByFirstnameContainingIgnoreCaseOrLastnameContainingIgnoreCaseOrUsernameContainingIgnoreCase(param,
-                        param, param, pageable);
+        return candidateRepository.search(param, pageable);
+//        return candidateRepository
+//                .findByFirstnameContainingIgnoreCaseOrLastnameContainingIgnoreCaseOrUsernameContainingIgnoreCase(param,
+//                        param, param, pageable);
     }
 
     @Override
