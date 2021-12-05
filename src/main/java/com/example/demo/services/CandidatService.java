@@ -1,11 +1,13 @@
 package com.example.demo.services;
 
+import java.io.IOException;
+import java.util.List;
+
 import com.example.demo.dto.CandidateDto;
 import com.example.demo.entities.Candidate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface CandidatService {
 
@@ -32,5 +34,7 @@ public interface CandidatService {
     Boolean existUsername(String username);
 
     Boolean existEmail(String email);
+
+    void uploadCandidates(MultipartFile file) throws IOException;
 
 }

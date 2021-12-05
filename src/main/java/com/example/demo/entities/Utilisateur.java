@@ -18,8 +18,8 @@ import java.util.Set;
 
 @Data
 @Entity
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "username"),
-        @UniqueConstraint(columnNames = "email")})
+@Table(name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = "username"),
+        @UniqueConstraint(columnNames = "email") })
 @NoArgsConstructor
 @ToString
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -39,7 +39,7 @@ public class Utilisateur implements Serializable {
     private String password;
     private String picture;
     private LocalDate dateOfBirth;
-    //@Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private Gender gender;
     private String phone;
     private String address;
@@ -55,6 +55,17 @@ public class Utilisateur implements Serializable {
         this.username = username;
         this.email = email;
         this.password = password;
+    }
+
+    public Utilisateur(String firstname, String lastname, String username, String email, String password,
+            LocalDate dateOfBirth, String phone) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.dateOfBirth = dateOfBirth;
+        this.phone = phone;
     }
 
     @JsonIgnore
