@@ -14,6 +14,8 @@ import com.example.demo.services.AdminService;
 import com.example.demo.services.CandidatService;
 import com.example.demo.services.UserService;
 import com.example.demo.utils.ResponseObject;
+
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 
@@ -46,10 +49,11 @@ public class AdminController {
          */
         @PostMapping("/candidate")
         public ResponseEntity<?> createCandidate(
-                @RequestBody @Valid CandidateRequest candidateRequest) {
+                        @RequestBody @Valid CandidateRequest candidateRequest) {
 
                 if (candidatService.existUsername(candidateRequest.getUsername())) {
-                        return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+                        return ResponseEntity.badRequest()
+                                        .body(new MessageResponse("Error: Username is already taken!"));
                 }
 
                 if (candidatService.existEmail(candidateRequest.getEmail())) {
@@ -65,7 +69,7 @@ public class AdminController {
 
                 BeanUtils.copyProperties(candidateDto2, candidateResponse);
                 ResponseObject<CandidateResponse> responseObject = new ResponseObject<CandidateResponse>(true,
-                        "Candidate created successfully", candidateResponse);
+                                "Candidate created successfully", candidateResponse);
                 return new ResponseEntity<ResponseObject<CandidateResponse>>(responseObject, HttpStatus.CREATED);
 
         }
@@ -86,12 +90,13 @@ public class AdminController {
                 BeanUtils.copyProperties(candidateDto, candidateResponse);
 
                 ResponseObject<CandidateResponse> responseObject = new ResponseObject<CandidateResponse>(true,
-                        "Candidate data", candidateResponse);
+                                "Candidate data", candidateResponse);
                 return new ResponseEntity<ResponseObject<CandidateResponse>>(responseObject, HttpStatus.OK);
         }
 
         /**
-         * Find All Candidates with search by firstname,lastname,username,email,address and filter by the post or activityArea
+         * Find All Candidates with search by firstname,lastname,username,email,address
+         * and filter by the post or activityArea
          *
          * @param page
          * @param size
@@ -101,24 +106,24 @@ public class AdminController {
          */
         @GetMapping("/candidate")
         public ResponseEntity<ResponseObject<Page<Candidate>>> getAllCandidates(
-                @RequestParam(name = "page", defaultValue = "0") int page,
-                @RequestParam(name = "size", defaultValue = "10") int size,
-                @RequestParam(required = false) String search, @RequestParam(required = false) String filter) {
+                        @RequestParam(name = "page", defaultValue = "0") int page,
+                        @RequestParam(name = "size", defaultValue = "10") int size,
+                        @RequestParam(required = false) String search, @RequestParam(required = false) String filter) {
                 ResponseObject<Page<Candidate>> responseObject = new ResponseObject<Page<Candidate>>();
                 if (StringUtils.isEmpty(search) && StringUtils.isEmpty(filter)) {
                         responseObject = new ResponseObject<Page<Candidate>>(true, "All Candidate data",
-                                candidatService.findAllCandidates(PageRequest.of(page, size)));
+                                        candidatService.findAllCandidates(PageRequest.of(page, size)));
                         return new ResponseEntity<ResponseObject<Page<Candidate>>>(responseObject, HttpStatus.OK);
                 } else {
                         if (!StringUtils.isEmpty(search)) {
                                 responseObject = new ResponseObject<Page<Candidate>>(true, "All Candidate data",
-                                        candidatService.searchAllCandidates(search,
-                                                PageRequest.of(page, size)));
+                                                candidatService.searchAllCandidates(search,
+                                                                PageRequest.of(page, size)));
                         }
                         if (!StringUtils.isEmpty(filter)) {
                                 responseObject = new ResponseObject<Page<Candidate>>(true, "All Candidate data",
-                                        candidatService.filterAllCandidates(filter,
-                                                PageRequest.of(page, size)));
+                                                candidatService.filterAllCandidates(filter,
+                                                                PageRequest.of(page, size)));
                         }
                         return new ResponseEntity<ResponseObject<Page<Candidate>>>(responseObject, HttpStatus.OK);
 
@@ -135,7 +140,7 @@ public class AdminController {
         public ResponseEntity<ResponseObject<String>> DeleteCandidate(@PathVariable Long id) {
                 candidatService.deleteCandidate(id);
                 ResponseObject<String> responseObject = new ResponseObject<String>(true,
-                        "Candidate deleted successfully", null);
+                                "Candidate deleted successfully", null);
                 return new ResponseEntity<ResponseObject<String>>(responseObject, HttpStatus.OK);
         }
 
@@ -148,7 +153,7 @@ public class AdminController {
          */
         @PutMapping("/candidate/{id}")
         public ResponseEntity<ResponseObject<CandidateResponse>> updateCandidate(@PathVariable Long id,
-                                                                                 @Valid @RequestBody CandidateRequest candidateRequest) {
+                        @Valid @RequestBody CandidateRequest candidateRequest) {
 
                 CandidateDto candidateDto = new CandidateDto();
 
@@ -161,7 +166,7 @@ public class AdminController {
                 BeanUtils.copyProperties(updateCandidate, candidateResponse);
 
                 ResponseObject<CandidateResponse> responseObject = new ResponseObject<CandidateResponse>(true,
-                        "Candidate updated successfully", candidateResponse);
+                                "Candidate updated successfully", candidateResponse);
                 return new ResponseEntity<ResponseObject<CandidateResponse>>(responseObject, HttpStatus.OK);
         }
 
@@ -173,7 +178,7 @@ public class AdminController {
          */
         @PutMapping("/personalData")
         public ResponseEntity<ResponseObject<AdminResponse>> updateCandidate(
-                @Valid @RequestBody AdminRequest adminRequest) {
+                        @Valid @RequestBody AdminRequest adminRequest) {
 
                 Object userPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -192,7 +197,34 @@ public class AdminController {
                 BeanUtils.copyProperties(adminDto2, adminResponse);
 
                 ResponseObject<AdminResponse> responseObject = new ResponseObject<AdminResponse>(true,
-                        "Admin updated successfully", adminResponse);
+                                "Admin updated successfully", adminResponse);
                 return new ResponseEntity<ResponseObject<AdminResponse>>(responseObject, HttpStatus.OK);
+        }
+
+        /**
+         * Import Candidates
+         *
+         * @param MultipartFile
+         */
+        @PostMapping(path = "/candidate/upload")
+        public ResponseEntity<?> UploadRecipients(@RequestParam("file") MultipartFile file)
+                        throws Exception {
+
+                if (!"csv".equals(FilenameUtils.getExtension(file.getOriginalFilename()))) {
+                        return ResponseEntity.badRequest()
+                                        .body(new MessageResponse("Error: File format is not supported!"));
+                }
+                try {
+                        candidatService.uploadCandidates(file);
+                        ResponseObject<Void> responseObject = new ResponseObject<>(true,
+                                        "Recipients uploaded successfully", null);
+                        return new ResponseEntity<>(responseObject, HttpStatus.OK);
+
+                } catch (Exception e) {
+                        ResponseObject<Void> responseObject = new ResponseObject<>(false,
+                                        "Could not upload the file: " + file.getOriginalFilename() + "!", null);
+                        return new ResponseEntity<>(responseObject, HttpStatus.EXPECTATION_FAILED);
+                }
+
         }
 }

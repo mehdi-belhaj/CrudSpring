@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDate;
+
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -19,10 +21,18 @@ import javax.persistence.Enumerated;
 @ToString
 @DiscriminatorValue(value = "Candidate")
 public class Candidate extends Utilisateur {
-    // @Column(columnDefinition = "ENUM('PENDING', 'ACTIVE', 'INACTIVE')")
     @Enumerated(EnumType.STRING)
     private Poste poste;
-    // @Column(columnDefinition = "ENUM('PENDING', 'ACTIVE', 'INACTIVE')")
     @Enumerated(EnumType.STRING)
     private ActivityArea activityArea;
+
+    public Candidate(String firstname, String lastname, String username,
+            String email, String password, LocalDate dateOfBirth, String phone, Poste poste,
+            ActivityArea activityArea) {
+        super(firstname, lastname, username, email, password, dateOfBirth, phone);
+        this.poste = poste;
+        this.activityArea = activityArea;
+
+    }
+
 }
