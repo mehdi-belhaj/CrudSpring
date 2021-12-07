@@ -203,6 +203,7 @@ public class CandidatServiceImpl implements CandidatService {
     @Override
     public Boolean existEmail(String email) {
         return candidateRepository.existsByEmail(email);
+    }
 
     public void uploadCandidates(MultipartFile file) throws IOException {
         List<Candidate> candidates = new ArrayList<>();
