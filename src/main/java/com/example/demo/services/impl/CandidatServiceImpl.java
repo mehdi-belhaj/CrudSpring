@@ -151,6 +151,10 @@ public class CandidatServiceImpl implements CandidatService {
         return candidateDto;
     }
 
+    public List<Candidate> getAllCandidate() {
+        return candidateRepository.findAll();
+    }
+
     public List<CandidateDto> getAllCandidates() {
         List<Candidate> candidates = candidateRepository.findAll();
 

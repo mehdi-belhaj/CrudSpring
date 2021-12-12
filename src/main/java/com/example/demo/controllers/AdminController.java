@@ -1,6 +1,7 @@
 package com.example.demo.controllers;
 
 import com.example.demo.config.services.UserDetailsImpl;
+import com.example.demo.dao.CandidateRepository;
 import com.example.demo.dto.AdminDto;
 import com.example.demo.dto.CandidateDto;
 import com.example.demo.dto.requests.AdminRequest;
@@ -26,6 +27,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 import javax.validation.Valid;
 
@@ -92,6 +95,14 @@ public class AdminController {
                 ResponseObject<CandidateResponse> responseObject = new ResponseObject<CandidateResponse>(true,
                                 "Candidate data", candidateResponse);
                 return new ResponseEntity<ResponseObject<CandidateResponse>>(responseObject, HttpStatus.OK);
+        }
+
+        @GetMapping("/candidates")
+        public ResponseEntity<ResponseObject<List<Candidate>>> getAllCandidates() {
+                ResponseObject<List<Candidate>> responseObject = new ResponseObject<List<Candidate>>(true,
+                                "All Candidate data",
+                                candidatService.getAllCandidate());
+                return new ResponseEntity<ResponseObject<List<Candidate>>>(responseObject, HttpStatus.OK);
         }
 
         /**
