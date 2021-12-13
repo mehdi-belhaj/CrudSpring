@@ -12,6 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Builder
 public class CandidateDto {
     private String firstname;
     private String lastname;
@@ -26,4 +27,9 @@ public class CandidateDto {
     private boolean state;
     private Poste poste;
     private ActivityArea activityArea;
+
+
+
+
+
 }
