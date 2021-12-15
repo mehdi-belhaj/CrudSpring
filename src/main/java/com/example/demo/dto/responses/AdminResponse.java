@@ -25,4 +25,5 @@ public class AdminResponse {
     private String phone;
     private String address;
     private String organization;
+    private String password;
 }

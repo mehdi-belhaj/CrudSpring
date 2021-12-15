@@ -34,7 +34,6 @@ public class UserController {
         return new ResponseEntity<ResponseObject<UtilisateurResponse>>(responseObject, HttpStatus.OK);
     }
 
-
     /**
      * Change password
      *
@@ -44,7 +43,7 @@ public class UserController {
      */
     @PutMapping(path = "/changePassword/{username}")
     public ResponseEntity<ResponseObject<MessageResponse>> changePassword(@PathVariable String username,
-                                                                          @RequestBody @Valid ChangePasswordRequest passwordBody) {
+            @RequestBody @Valid ChangePasswordRequest passwordBody) {
         ResponseObject<MessageResponse> responseObject = new ResponseObject<MessageResponse>(true,
                 "User's password changed", userService.changePassword(username, passwordBody));
         return new ResponseEntity<ResponseObject<MessageResponse>>(responseObject, HttpStatus.OK);

@@ -1,7 +1,6 @@
 package com.example.demo.controllers;
 
 import com.example.demo.config.services.UserDetailsImpl;
-import com.example.demo.dao.CandidateRepository;
 import com.example.demo.dto.AdminDto;
 import com.example.demo.dto.CandidateDto;
 import com.example.demo.dto.requests.AdminRequest;
@@ -53,8 +52,8 @@ public class AdminController {
         @PostMapping("/candidate")
         public ResponseEntity<?> createCandidate(
                         @RequestBody @Valid CandidateRequest candidateRequest) {
-
                 if (candidatService.existUsername(candidateRequest.getUsername())) {
+
                         return ResponseEntity.badRequest()
                                         .body(new MessageResponse("Error: Username is already taken!"));
                 }
@@ -103,6 +102,14 @@ public class AdminController {
                                 "All Candidate data",
                                 candidatService.getAllCandidate());
                 return new ResponseEntity<ResponseObject<List<Candidate>>>(responseObject, HttpStatus.OK);
+        }
+
+        @GetMapping("/admins")
+        public ResponseEntity<ResponseObject<List<AdminDto>>> getAllAdmins() {
+                ResponseObject<List<AdminDto>> responseObject = new ResponseObject<List<AdminDto>>(true,
+                                "All Admins data",
+                                adminService.getAllAdmins());
+                return new ResponseEntity<ResponseObject<List<AdminDto>>>(responseObject, HttpStatus.OK);
         }
 
         /**

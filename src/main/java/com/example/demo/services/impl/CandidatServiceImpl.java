@@ -18,7 +18,6 @@ import com.example.demo.enumerations.RoleName;
 import com.example.demo.exceptions.EntityNotFoundException;
 import com.example.demo.services.CandidatService;
 import com.example.demo.services.UploadService;
-import com.example.demo.utils.Util;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -201,12 +200,12 @@ public class CandidatServiceImpl implements CandidatService {
 
     @Override
     public Boolean existUsername(String username) {
-        return candidateRepository.existsByUsername(username);
+        return userRepository.existsByUsername(username);
     }
 
     @Override
     public Boolean existEmail(String email) {
-        return candidateRepository.existsByEmail(email);
+        return userRepository.existsByEmail(email);
     }
 
     public void uploadCandidates(MultipartFile file) throws IOException {

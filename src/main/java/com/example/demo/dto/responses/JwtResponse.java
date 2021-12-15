@@ -1,5 +1,11 @@
 package com.example.demo.dto.responses;
 
+import com.example.demo.enumerations.Gender;
+
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import java.time.LocalDate;
+
 public class JwtResponse {
     private String token;
     private String type = "Bearer";
@@ -9,8 +15,14 @@ public class JwtResponse {
     private String firstname;
     private String lastname;
     private String role;
+    private LocalDate dateOfBirth;
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+    private String phone;
+    private String address;
 
-    public JwtResponse(String token, Long id, String username, String firstname, String lastname, String email, String role) {
+    public JwtResponse(String token, Long id, String username, String firstname, String lastname, String email,
+            String role) {
         this.token = token;
         this.id = id;
         this.username = username;
@@ -18,6 +30,21 @@ public class JwtResponse {
         this.role = role;
         this.firstname = firstname;
         this.lastname = lastname;
+    }
+
+    public JwtResponse(String token, Long id, String username, String firstname, String lastname, String email,
+            String role, LocalDate dateOfBirth, Gender gender, String phone, String address) {
+        this.token = token;
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.role = role;
+        this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+        this.phone = phone;
+        this.address = address;
     }
 
     public String getToken() {
@@ -64,7 +91,6 @@ public class JwtResponse {
         return role;
     }
 
-
     public String getFirstname() {
         return firstname;
     }
@@ -79,5 +105,37 @@ public class JwtResponse {
 
     public void setLastname(String lastname) {
         this.lastname = lastname;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
