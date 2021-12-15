@@ -1,16 +1,10 @@
 package com.example.demo.controllers;
 
-import com.example.demo.dto.AdminDto;
-import com.example.demo.dto.CandidateDto;
 import com.example.demo.dto.requests.ChangePasswordRequest;
-import com.example.demo.dto.responses.AdminResponse;
-import com.example.demo.dto.responses.CandidateResponse;
 import com.example.demo.dto.responses.MessageResponse;
 import com.example.demo.dto.responses.UtilisateurResponse;
-import com.example.demo.services.AdminService;
 import com.example.demo.services.UserService;
 import com.example.demo.utils.ResponseObject;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +18,7 @@ import javax.validation.Valid;
 public class UserController {
     @Autowired
     private UserService userService;
+
     /**
      * get User by his username
      *
@@ -39,7 +34,6 @@ public class UserController {
         return new ResponseEntity<ResponseObject<UtilisateurResponse>>(responseObject, HttpStatus.OK);
     }
 
-
     /**
      * Change password
      *
@@ -49,12 +43,10 @@ public class UserController {
      */
     @PutMapping(path = "/changePassword/{username}")
     public ResponseEntity<ResponseObject<MessageResponse>> changePassword(@PathVariable String username,
-                                                                          @RequestBody @Valid ChangePasswordRequest passwordBody) {
+            @RequestBody @Valid ChangePasswordRequest passwordBody) {
         ResponseObject<MessageResponse> responseObject = new ResponseObject<MessageResponse>(true,
                 "User's password changed", userService.changePassword(username, passwordBody));
         return new ResponseEntity<ResponseObject<MessageResponse>>(responseObject, HttpStatus.OK);
     }
-
-
 
 }

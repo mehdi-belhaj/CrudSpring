@@ -21,7 +21,8 @@ public class JwtResponse {
     private String phone;
     private String address;
 
-    public JwtResponse(String token, Long id, String username, String firstname, String lastname, String email, String role) {
+    public JwtResponse(String token, Long id, String username, String firstname, String lastname, String email,
+            String role) {
         this.token = token;
         this.id = id;
         this.username = username;
@@ -32,7 +33,7 @@ public class JwtResponse {
     }
 
     public JwtResponse(String token, Long id, String username, String firstname, String lastname, String email,
-                       String role, LocalDate dateOfBirth, Gender gender, String phone, String address) {
+            String role, LocalDate dateOfBirth, Gender gender, String phone, String address) {
         this.token = token;
         this.id = id;
         this.username = username;
@@ -89,7 +90,6 @@ public class JwtResponse {
     public String getRole() {
         return role;
     }
-
 
     public String getFirstname() {
         return firstname;

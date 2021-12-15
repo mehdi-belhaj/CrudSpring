@@ -18,7 +18,6 @@ import com.example.demo.enumerations.RoleName;
 import com.example.demo.exceptions.EntityNotFoundException;
 import com.example.demo.services.CandidatService;
 import com.example.demo.services.UploadService;
-import com.example.demo.utils.Util;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
