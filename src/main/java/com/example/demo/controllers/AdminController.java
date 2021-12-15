@@ -10,6 +10,7 @@ import com.example.demo.dto.responses.CandidateResponse;
 import com.example.demo.dto.responses.MessageResponse;
 import com.example.demo.entities.Admin;
 import com.example.demo.entities.Candidate;
+import com.example.demo.entities.Utilisateur;
 import com.example.demo.services.AdminService;
 import com.example.demo.services.CandidatService;
 import com.example.demo.services.UserService;
@@ -170,8 +171,21 @@ public class AdminController {
          * @return candidateResponse
          */
         @PutMapping("/candidate/{id}")
-        public ResponseEntity<ResponseObject<CandidateResponse>> updateCandidate(@PathVariable Long id,
+        public ResponseEntity<?> updateCandidate(@PathVariable Long id,
                         @Valid @RequestBody CandidateRequest candidateRequest) {
+                Utilisateur user = userService.getUtilisateurById(id);
+                if (!(user.getUsername().equals(candidateRequest.getUsername()))
+                                && candidatService.existUsername(candidateRequest.getUsername())) {
+
+                        return ResponseEntity.badRequest()
+                                        .body(new MessageResponse("Error: Username is already taken!"));
+                }
+
+                if (!(user.getEmail().equals(candidateRequest.getEmail()))
+                                && candidatService.existEmail(candidateRequest.getEmail())) {
+                        return ResponseEntity.badRequest()
+                                        .body(new MessageResponse("Error: Email is already in use!"));
+                }
 
                 CandidateDto candidateDto = new CandidateDto();
 

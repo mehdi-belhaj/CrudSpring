@@ -14,4 +14,7 @@ public interface UserService {
     public UtilisateurResponse getUser(String username);
 
     public Utilisateur getUtilisateur(String username);
+
+    public Utilisateur getUtilisateurById(Long id);
+
 }
