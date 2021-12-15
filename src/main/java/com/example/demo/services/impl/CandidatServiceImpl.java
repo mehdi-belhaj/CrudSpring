@@ -200,12 +200,12 @@ public class CandidatServiceImpl implements CandidatService {
 
     @Override
     public Boolean existUsername(String username) {
-        return candidateRepository.existsByUsername(username);
+        return userRepository.existsByUsername(username);
     }
 
     @Override
     public Boolean existEmail(String email) {
-        return candidateRepository.existsByEmail(email);
+        return userRepository.existsByEmail(email);
     }
 
     public void uploadCandidates(MultipartFile file) throws IOException {

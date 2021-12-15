@@ -52,8 +52,8 @@ public class AdminController {
         @PostMapping("/candidate")
         public ResponseEntity<?> createCandidate(
                         @RequestBody @Valid CandidateRequest candidateRequest) {
-
                 if (candidatService.existUsername(candidateRequest.getUsername())) {
+
                         return ResponseEntity.badRequest()
                                         .body(new MessageResponse("Error: Username is already taken!"));
                 }
