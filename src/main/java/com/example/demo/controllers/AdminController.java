@@ -227,7 +227,7 @@ public class AdminController {
                 AdminResponse adminResponse = new AdminResponse();
 
                 BeanUtils.copyProperties(adminDto2, adminResponse);
-
+                adminResponse.setRole("ROLE_ADMIN");
                 ResponseObject<AdminResponse> responseObject = new ResponseObject<AdminResponse>(true,
                                 "Admin updated successfully", adminResponse);
                 return new ResponseEntity<ResponseObject<AdminResponse>>(responseObject, HttpStatus.OK);

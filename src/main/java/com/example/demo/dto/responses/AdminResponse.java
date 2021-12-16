@@ -26,4 +26,5 @@ public class AdminResponse {
     private String address;
     private String organization;
     private String password;
+    private String role;
 }
