@@ -174,15 +174,15 @@ public class AdminController {
         public ResponseEntity<?> updateCandidate(@PathVariable Long id,
                         @Valid @RequestBody CandidateRequest candidateRequest) {
                 Utilisateur user = userService.getUtilisateurById(id);
-                if (!(user.getUsername().equals(candidateRequest.getUsername()))
-                                && candidatService.existUsername(candidateRequest.getUsername())) {
+                if (!(user.getUsername().toLowerCase().equals(candidateRequest.getUsername().toLowerCase()))
+                                && candidatService.existUsername(candidateRequest.getUsername().toLowerCase())) {
 
                         return ResponseEntity.badRequest()
                                         .body(new MessageResponse("Error: Username is already taken!"));
                 }
 
-                if (!(user.getEmail().equals(candidateRequest.getEmail()))
-                                && candidatService.existEmail(candidateRequest.getEmail())) {
+                if (!(user.getEmail().toLowerCase().equals(candidateRequest.getEmail().toLowerCase()))
+                                && candidatService.existEmail(candidateRequest.getEmail().toLowerCase())) {
                         return ResponseEntity.badRequest()
                                         .body(new MessageResponse("Error: Email is already in use!"));
                 }
@@ -241,7 +241,6 @@ public class AdminController {
         @PostMapping(path = "/candidate/upload")
         public ResponseEntity<?> UploadRecipients(@RequestParam("file") MultipartFile file)
                         throws Exception {
-
                 if (!"csv".equals(FilenameUtils.getExtension(file.getOriginalFilename()))) {
                         return ResponseEntity.badRequest()
                                         .body(new MessageResponse("Error: File format is not supported!"));
