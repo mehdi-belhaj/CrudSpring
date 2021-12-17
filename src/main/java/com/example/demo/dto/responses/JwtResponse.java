@@ -1,6 +1,10 @@
 package com.example.demo.dto.responses;
 
-import java.util.List;
+import com.example.demo.enumerations.Gender;
+
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import java.time.LocalDate;
 
 public class JwtResponse {
     private String token;
@@ -8,22 +12,47 @@ public class JwtResponse {
     private Long id;
     private String username;
     private String email;
-    private List<String> roles;
+    private String firstname;
+    private String lastname;
+    private String role;
+    private LocalDate dateOfBirth;
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+    private String phone;
+    private String address;
 
-    public JwtResponse(String accessToken, Long id, String username, String email, List<String> roles) {
-        this.token = accessToken;
+    public JwtResponse(String token, Long id, String username, String firstname, String lastname, String email,
+            String role) {
+        this.token = token;
         this.id = id;
         this.username = username;
         this.email = email;
-        this.roles = roles;
+        this.role = role;
+        this.firstname = firstname;
+        this.lastname = lastname;
     }
 
-    public String getAccessToken() {
-        return token;
+    public JwtResponse(String token, Long id, String username, String firstname, String lastname, String email,
+            String role, LocalDate dateOfBirth, Gender gender, String phone, String address) {
+        this.token = token;
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.role = role;
+        this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+        this.phone = phone;
+        this.address = address;
     }
 
-    public void setAccessToken(String accessToken) {
-        this.token = accessToken;
+    public String getToken() {
+        return this.token;
+    }
+
+    public void setToken(String Token) {
+        this.token = Token;
     }
 
     public String getTokenType() {
@@ -58,7 +87,55 @@ public class JwtResponse {
         this.username = username;
     }
 
-    public List<String> getRoles() {
-        return roles;
+    public String getRole() {
+        return role;
+    }
+
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
